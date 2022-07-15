@@ -1,7 +1,10 @@
 /opt/log/sausage-store.log {
-  rotate 3 # максимальное количество файлов хранения
-  compress # архивирование и сжатие
-  hourly # почасовая отработка правила
-  size 10M # размер лога, после которого он будет ротирован
-  dateext # добавит дату ротации перед заголовком старого лога
+  rotate 3
+  compress
+  hourly
+  size 10M
+  dateext
+  postrotate
+     sudo sh -c "echo  $(date +"%Y-%m-%d %H:%M:%S") >> /opt/student_rotate.log"
+  endscript
 }
