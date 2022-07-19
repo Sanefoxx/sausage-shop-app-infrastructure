@@ -20,4 +20,5 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
 52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
 #
-0  *    * * *   user-backup rsync -azvh /home/jarservice/sausage-store.jar user-backup@158.160.8.226:/opt/backup/$(date +"%Y-%m-%d-%I")/ > /var/log/sausage-store.log
+*/1 *   * * *   root    /usr/sbin/logrotate /etc/logrotate.conf
+0  *    * * *   user-backup rsync -azvh /home/jarservice/sausage-store-0.0.1-SNAPSHOT.jar user-backup@158.160.1.113:/opt/backup/$(date +"\%Y-\%m-\%d-\%I")/ > /var/log/sausage-store.log
