@@ -1,0 +1,10 @@
+/opt/log/sausage-store.log {
+  rotate 3
+  compress
+  missingok
+  size 10M
+  copytruncate
+  postrotate
+     sudo sh -c "echo  $(date +"%Y-%m-%d %H:%M:%S") >> /opt/student_rotate.log"
+  endscript
+}
