@@ -1,0 +1,60 @@
+---
+# tasks file for frontend
+- name: install node
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -
+    apt-get install -y nodejs
+  become: yes
+
+- name: install http-server
+  community.general.npm:
+    name: http-server
+    global: yes
+  become: yes
+
+- name: Reroute frontend
+  shell: iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 1561
+  become: yes
+
+- name: add user
+  user:
+    name: www-data
+    shell: /bin/bash
+    createhome: no
+  become: yes
+
+- name: create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop:
+    - /tmp/www-data
+    - /var/www-data/dist/frontend
+  become: yes
+
+- name: download frontend artifact
+  shell: |
+    curl -u "{{ nexus_login }}":"{{ nexus_password }}" -o /tmp/www-data/sausage-store.tar.gz https://nexus.praktikum-services.ru/repository/sausage-store-lisitsin-aleksandr-frontend/sausage-store-front/sausage-store/{{ frontend_version }}/sausage-store-{{ frontend_version }}.tar.gz
+    tar xvf /tmp/www-data/sausage-store.tar.gz --directory=/tmp/www-data/
+    cp -rf /tmp/www-data/frontend/dist/frontend/* /var/www-data/dist/frontend
+  become: yes
+
+- name: unit service creation
+  template:
+    src: sausage-store-frontend.service.j2
+    dest: /etc/systemd/system/sausage-store-frontend.service
+  become: yes
+
+- name: daemon reload
+  systemd:
+    daemon_reload: yes
+  become: yes
+
+- name: run frontend
+  service:
+    name: sausage-store-frontend
+    state: restarted
+  become: yes

@@ -1,0 +1,5 @@
+frontend_version: 1.0.102938
+frontend_service_user: www-data
+frontend_working_directory: /var/www-data
+frontend_output: /opt/log/out-front.log
+frontend_port: 1561

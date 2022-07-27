@@ -1,0 +1,10 @@
+---
+- name: Play backend
+  hosts: backend
+  roles:
+    - backend
+
+- name: Play frontend
+  hosts: frontend
+  roles:
+    - frontend 

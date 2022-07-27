@@ -1,0 +1,7 @@
+backend_service_user: jarservice
+backend_report_directory: /opt/log/logs/reports
+backend_log_directory: /opt/log
+backend_output: /opt/log/sausage-store.log
+backend_error: /opt/log/sausage-store.log
+backend_lib_directory: /opt/sausage-store/backend/lib 
+
