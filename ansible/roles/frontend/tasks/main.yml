@@ -1,9 +1,32 @@
 ---
 # tasks file for frontend
-- name: install node
-  shell: |
-    curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -
-    apt-get install -y nodejs
+- name: collect only selected facts
+  ansible.builtin.setup:
+    filter:
+      - 'ansible_distribution_release'
+
+- name: add gpg key for nodejs repo
+  ansible.builtin.apt_key:
+    url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+    id: 9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280
+    keyring: /usr/share/keyrings/nodesource.gpg
+    state: present
+  become: yes
+
+- name: add nodejs repo
+  ansible.builtin.apt_repository:
+    filename: deb_nodesource
+    repo: "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x {{ ansible_distribution_release }} main"
+    update_cache: yes
+    state: present
+  become: yes
+
+- name: install requirements packages
+  ansible.builtin.apt:
+    name:
+      - nodejs
+    update_cache: yes
+    state: present
   become: yes
 
 - name: install http-server
