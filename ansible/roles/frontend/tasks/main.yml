@@ -1,0 +1,107 @@
+---
+# tasks file for frontend
+- name: collect only selected facts
+  ansible.builtin.setup:
+    filter:
+      - 'ansible_distribution_release'
+
+- name: add gpg key for nodejs repo
+  ansible.builtin.apt_key:
+    url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+    id: 9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280
+    keyring: /usr/share/keyrings/nodesource.gpg
+    state: present
+  become: yes
+
+- name: add nodejs repo
+  ansible.builtin.apt_repository:
+    filename: deb_nodesource
+    repo: "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x {{ ansible_distribution_release }} main"
+    update_cache: yes
+    state: present
+  become: yes
+
+- name: install requirements packages
+  ansible.builtin.apt:
+    name:
+      - nodejs
+    update_cache: yes
+    state: present
+  become: yes
+
+- name: install http-server
+  community.general.npm:
+    name: http-server
+    global: yes
+  become: yes
+
+- name: reroute frontend
+  iptables:
+    table: nat
+    chain: PREROUTING
+    in_interface: eth0
+    protocol: tcp
+    match: tcp
+    destination_port: 443
+    jump: REDIRECT
+    to_ports: 1561
+  become: yes
+
+- name: add user
+  user:
+    name: www-data
+    shell: /bin/bash
+    createhome: no
+  become: yes
+
+- name: create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop:
+    - /tmp/www-data
+    - /var/www-data/dist/frontend
+  become: yes
+
+- name: fetch archive
+  no_log: true
+  get_url:
+    url: "https://nexus.praktikum-services.ru/repository/sausage-store-lisitsin-aleksandr-frontend/sausage-store-front/sausage-store/{{ frontend_version }}/sausage-store-{{ frontend_version }}.tar.gz"
+    dest: "/tmp/www-data/sausage-store.tar.gz"
+    username: "{{ nexus_login }}"
+    password: "{{ nexus_password }}"
+  become: yes
+
+- name: extract archive
+  unarchive:
+    src: /tmp/www-data/sausage-store.tar.gz
+    dest: /tmp/www-data
+    remote_src: yes
+  become: yes
+
+- name: copy files
+  copy:
+    src: /tmp/www-data/frontend/dist/frontend
+    dest: /var/www-data/dist
+    remote_src: yes
+  become: yes
+
+- name: unit service creation
+  template:
+    src: sausage-store-frontend.service.j2
+    dest: /etc/systemd/system/sausage-store-frontend.service
+  become: yes
+
+- name: daemon reload
+  systemd:
+    daemon_reload: yes
+  become: yes
+
+- name: run frontend
+  service:
+    name: sausage-store-frontend
+    state: restarted
+  become: yes
