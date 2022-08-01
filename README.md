@@ -1,6 +1,6 @@
-Выполнил анализ до создагия индексов:
-
+Выполнил анализ до создания индексов:
 alexndrlisitsin=> EXPLAIN ANALYZE select COUNT(*) from orders o INNER JOIN order_product op ON o.id = op.order_id INNER JOIN product p ON op.product_id = p.id WHERE p.id = 4;
+
                                                                             QUERY PLAN
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
  Finalize Aggregate  (cost=407739.43..407739.44 rows=1 width=8) (actual time=6834.961..6858.172 rows=1 loops=1)
