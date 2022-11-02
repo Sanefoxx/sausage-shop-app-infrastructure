@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: backend-report
   labels:
-    app: backend
+    app: backend-report
 spec:
   replicas: 3
   # Стратегия развёртывания. Recreate — удалит сначала все старые поды
@@ -13,15 +13,15 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: backend
+      app: backend-report
   template:
     metadata:
       labels:
-        app: backend
+        app: backend-report
     spec:
       containers:
-        - name: backend
-          image: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store/sausage-backend:latest
+        - name: backend-report
+          image: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store/sausage-backend-report:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: VAULT_HOST
@@ -32,15 +32,7 @@ spec:
                   name: vault
                   key: vault_token
           ports:
-            - name: backend
-              containerPort: 8080
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 6
+            - name: backend-report
+              containerPort: 8081
       imagePullSecrets:
         - name: docker-config-secret
