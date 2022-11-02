@@ -28,7 +28,7 @@ deploy-k8s:
     - scp -rp ./kubernetes/backend ${DEV_USER}@${DEV_HOST}:/home/student/k8s-deploy
     - scp -rp ./kubernetes/backend-report ${DEV_USER}@${DEV_HOST}:/home/student/k8s-deploy
     - scp -rp ./kubernetes/frontend ${DEV_USER}@${DEV_HOST}:/home/student/k8s-deploy
-    - ssh ${DEV_USER}@${DEV_HOST} "export "K8SCONFIG=${KUBECONFIG}"";
+    - ssh ${DEV_USER}@${DEV_HOST} "export "K8SCONFIG=${KUBECONFIG}";"
       /bin/bash -s " < ./kubernetes/deploy-k8s.sh
 
   environment:
