@@ -33,14 +33,6 @@ spec:
                   key: vault_token
           ports:
             - name: backend-report
-              containerPort: 8080
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 6
+              containerPort: 8081
       imagePullSecrets:
         - name: docker-config-secret
