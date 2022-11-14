@@ -1,0 +1,50 @@
+backend:
+  # Вместо latest правильнее использовать версию .Chart.AppVersion в шаблоне
+  image:
+    repository: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store/sausage-backend:latest
+    tag: latest
+  replicas: 3
+  service:
+    port: 8080
+    targetPort: 8080
+  revisionHistoryLimit: 15
+  imagePullPolicy: Always
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+      maxSurge: 20%
+  startupProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 6
+
+backend-report:
+  image:
+    repository: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store/sausage-backend-report:latest
+    tag: latest
+  replicas: 3
+  service:
+    port: 8081
+    targetPort: 8081
+  revisionHistoryLimit: 15
+  imagePullPolicy: Always
+  strategy:
+    type: Recreate
+
+frontend:
+  image:
+    repository: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store/sausage-frontend:latest
+    tag: latest
+  replicas: 1
+  service:
+    port: 80
+    targetPort: 8080
+  revisionHistoryLimit: 15
+  imagePullPolicy: Always
+  strategy:
+    type: Recreate
+  fqdn: lisitsin-aleksandr-06.k8s.praktikum-services.tech
+  ingress:
+    port: 80
