@@ -1,0 +1,46 @@
+variables:
+  VERSION: 0.1.${CI_PIPELINE_ID}
+  
+stages:
+  - release
+  - deploy
+
+upload-helm:
+  stage: release
+  image: dtzar/helm-kubectl
+
+  before_script:
+    - mkdir -p .kube
+    - echo -n $KUBECONFIG | base64 -d > .kube/config
+
+  script:
+    - cd sausage-store-chart
+    - helm package --version $VERSION ./
+    - curl -v -u "${NEXUS_REPO_USER}:$(echo $NEXUS_REPO_PASS | base64 -d)" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_HELM_URL}
+  
+  after_script:
+    - rm .kube/config
+
+deploy-helm:
+  stage: deploy
+  image: dtzar/helm-kubectl
+  when: manual
+  
+  before_script:
+    - mkdir -p .kube
+    - echo -n $KUBECONFIG | base64 -d > .kube/config
+
+  script:
+    - helm repo add nexus $NEXUS_HELM_REPO --username ${NEXUS_REPO_USER} --password $(echo $NEXUS_REPO_PASS | base64 -d)"
+    - helm repo update
+    - helm upgrade --install sausage-store \
+      --set environment=test \
+      --set frontend.fqdn=${SAUSAGE_STORE_URL} \
+      --atomic --timeout 15m \
+      nexus/sausage-store
+  after_script:
+    - rm .kube/config
+  
+  environment:
+    name: helm-pack
+    url: $SAUSAGE_STORE_URL
