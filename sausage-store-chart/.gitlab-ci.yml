@@ -11,7 +11,7 @@ upload-helm:
 
   before_script:
     - mkdir -p .kube
-    - echo -n $KUBECONFIG | base64 -d > .kube/config
+    - echo "${KUBECONFIG}" | base64 -d > .kube/config
 
   script:
     - cd sausage-store-chart
@@ -28,7 +28,7 @@ deploy-helm:
   
   before_script:
     - mkdir -p .kube
-    - echo -n $KUBECONFIG | base64 -d > .kube/config
+    - echo "${KUBECONFIG}" | base64 -d > .kube/config
 
   script:
     - helm repo add nexus $NEXUS_REPO_HELM_URL --username ${NEXUS_REPO_USER} --password "$NEXUS_REPO_PASS"
@@ -36,7 +36,7 @@ deploy-helm:
     - >
       helm upgrade --install sausage-store \
         --set environment=test \
-        --set frontend.fqdn="lisitsin-aleksandr-06.k8s.praktikum-services.tech" \
+        --set frontend.fqdn=${SAUSAGE_STORE_URL} \
         --atomic --timeout 15m \
           nexus/sausage-store
   after_script:
