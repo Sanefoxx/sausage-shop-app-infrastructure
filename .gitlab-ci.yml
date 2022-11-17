@@ -2,14 +2,25 @@ variables:
   VERSION: 1.0.${CI_PIPELINE_ID}
 
 stages:
-  - k8s-pipeline
+  - module-pipelines
 
 kubernetes:
-  stage: k8s-pipeline
+  stage: module-pipelines
   trigger:
     include:
       - "/kubernetes/.gitlab-ci.yml"
     strategy: depend
-  # only:
-  #   changes:
-  #     - kubernetes/**/*
+  only:
+    changes:
+      - kubernetes/**/*
+  
+  
+helm:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/sausage-store-chart/.gitlab-ci.yml"
+    strategy: depend
+#  only:
+#    changes:
+#      - sausage-store-chart/**/*
