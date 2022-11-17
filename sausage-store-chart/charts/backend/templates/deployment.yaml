@@ -36,23 +36,6 @@ spec:
                 secretKeyRef:
                   name: vault-helm
                   key: vault_token
-            - name: POSTGRES_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-helm
-                  key: postgres_host
-            - name: POSTGRES_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-helm
-                  key: postgres_port
-            - name: POSTGRES_DBNAME
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-helm
-                  key: postgres_dbname
-            - name: SPRING_DATASOURCE_URL
-              value: "{{ .Values.global.springDatasourceUrl }}"
             - name: BACKEND_PORT
               value: "{{ .Values.global.backendPort }}"
             - name: SPRING_FLYWAY_BASELINE
