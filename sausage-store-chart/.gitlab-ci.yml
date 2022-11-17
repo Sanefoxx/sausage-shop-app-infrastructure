@@ -22,6 +22,7 @@ upload-helm:
     - rm .kube/config
 
 deploy-helm:
+  #test
   stage: deploy
   image: dtzar/helm-kubectl
   when: manual
