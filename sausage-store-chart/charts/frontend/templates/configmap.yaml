@@ -15,6 +15,6 @@ data:
         try_files $uri $uri/ /index.html;
       }
       location /api {
-          proxy_pass http://sausage-backend:{{ .Values.global.backendPort | int }};
+          proxy_pass http://sausage-backend:{{ .Values.global.backendPort }};
       }
     }
