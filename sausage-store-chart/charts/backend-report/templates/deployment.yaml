@@ -35,8 +35,6 @@ spec:
                   key: vault_token
             - name: BACKEND_PORT
               value: "{{ .Values.global.backendPort }}"
-            - name: SPRING_FLYWAY_BASELINE
-              value: "{{ .Values.global.springFlywayBaseline }}"
           ports:
             - name: backend-report
               containerPort: {{ .Values.global.backendPort }}
