@@ -60,7 +60,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: "{{ .Values.global.backendPort }}"
+              port: {{ .Values.global.backendPort }}
             initialDelaySeconds: 15
             periodSeconds: 30
             timeoutSeconds: 2
