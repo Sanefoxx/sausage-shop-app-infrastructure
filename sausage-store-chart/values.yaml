@@ -9,7 +9,7 @@ secrets:
 
 global:
   springDatasourceUrl: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DBNAME}
-  backendPort: "8080"
+  backendPort: 8080
   springFlywayBaseline: true
   appName: sausage-store
   environment: test

@@ -9,6 +9,6 @@ spec:
   ports:
     - port: {{ .Values.port }}
       protocol: TCP
-      targetPort: {{ .Values.port }}
+      targetPort: "{{ .Values.port }}"
   selector:
     app: "{{ .Values.name }}"

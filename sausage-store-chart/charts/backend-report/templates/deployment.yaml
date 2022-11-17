@@ -51,16 +51,16 @@ spec:
             - name: SPRING_DATASOURCE_URL
               value: "{{ .Values.global.springDatasourceUrl }}"
             - name: BACKEND_PORT
-              value: {{ .Values.global.backendPort }}
+              value: "{{ .Values.global.backendPort }}"
             - name: SPRING_FLYWAY_BASELINE
               value: "{{ .Values.global.springFlywayBaseline }}"
           ports:
             - name: backend-report
-              containerPort: {{ .Values.global.backendPort }}
+              containerPort: "{{ .Values.global.backendPort }}"
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.global.backendPort }}
+              port: "{{ .Values.global.backendPort }}"
             initialDelaySeconds: 15
             periodSeconds: 30
             timeoutSeconds: 2
