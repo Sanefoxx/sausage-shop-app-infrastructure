@@ -38,6 +38,12 @@ deploy-helm:
       helm upgrade --install sausage-store \
         --set environment=test \
         --set frontend.fqdn=${SAUSAGE_STORE_URL} \
+        --set secrets.vaultToken=${VAULT_TOKEN} \
+        --set secrets.vaultHost=${VAULT_HOST} \
+        --set secrets.postgresHost=${PSQL_HOST} \
+        --set secrets.postgresPort=${PSQL_PORT} \
+        --set secrets.postgresDBName=${PSQL_DBNAME} \
+        --set secrets.dockerConfigJson=${DOCKER_CONFIG_JSON} \
         --atomic --timeout 15m \
         --kubeconfig .kube/config \
           nexus/sausage-store

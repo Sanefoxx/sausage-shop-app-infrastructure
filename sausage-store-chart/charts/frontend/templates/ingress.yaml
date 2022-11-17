@@ -2,20 +2,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: frontend
+  name: "{{ .Chart.Name }}-{{ .Release.Name }}"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    {{- include "sausage-store.labels" . | nindent 4 }}
 spec:
   ingressClassName: "nginx"
   tls:
     - hosts:
-        - "{{ .Values.fqdn }}"
+        - {{ .Values.fqdn }}
   rules:
-    - host: "{{ .Values.fqdn }}"
+    - host: {{ .Values.fqdn }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: "{{ .Chart.Name }}"
+                name: {{ .Values.name }}
                 port:
-                  number: {{ .Values.ingress.port }}
+                  number: {{ .Values.port }}

@@ -1,64 +1,60 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-{{ .Release.Name }}
+  name: "{{ .Chart.Name }}-{{ .Release.Name }}"
   namespace: "{{ .Release.Namespace }}"
   labels:
-    app: "{{ .Chart.Name }}"
-    app.kubernetes.io/name: sausage-frontend
-    app.kubernetes.io/instance: "{{ .Release.Name }}"
-    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
-    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app.kubernetes.io/component: frontend
-    app.kubernetes.io/part-of: sausage-store
-    env: "{{ .Values.environment }}"
+    {{- include "sausage-store.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicas }}
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  replicas: {{ .Values.replicas }}
   strategy:
-    type: "{{ .Values.strategy.type }}"
+    type: Recreate
   selector:
     matchLabels:
-      app: "{{ .Chart.Name }}"
+      app: "{{ .Values.name }}"
   template:
     metadata:
       labels:
-        app: "{{ .Chart.Name }}"
+        app: "{{ .Values.name }}"
     spec:
-      containers:
-        - name: frontend
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: "{{ .Values.imagePullPolicy }}"
-          volumeMounts:
-            - name: nginx-config
-              mountPath: /etc/nginx/conf.d/sausage-store.conf
-              subPath: sausage-store.conf
-          env:
-            - name: VAULT_HOST
-              value: 51.250.87.102
-            - name: VAULT_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: vault
-                  key: vault_token
-          ports:
-            - name: frontend
-              containerPort: {{ .Values.service.targetPort }}
       affinity:
         nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              preference:
-                matchExpressions:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
                   - key: app
                     operator: In
                     values:
                       - frontend
-      imagePullSecrets:
-        - name: docker-config-secret
+      containers:
+        - image: {{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          name: "{{ .Values.name }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: {{ .Values.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+          env:
+            - name: BACKEND_URL
+              value: "http://localhost/api"
+          ports:
+            - name: frontend
+              containerPort: {{ .Values.port }}
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: nginx.conf
+              readOnly: true
       volumes:
-        - name: nginx-config
+        - name: nginx-conf
           configMap:
-            name: sausage-store-configmap
+            name: nginx-conf-{{ .Release.Name }}
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+      imagePullSecrets:
+        - name: docker-config-secret-helm

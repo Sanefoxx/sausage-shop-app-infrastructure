@@ -1,50 +1,68 @@
+secrets:
+  vaultToken: ""
+  vaultHost: ""
+  postgresHost: ""
+  postgresPort: ""
+  postgresDBName: ""
+  dockerConfigJson: ""
+
+
+global:
+  springDatasourceUrl: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DBNAME}
+  backendPort: 8080
+  springFlywayBaseline: true
+  appName: sausage-store
+  environment: test
+  imageRegistry: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store
+
 backend:
-  # Вместо latest правильнее использовать версию .Chart.AppVersion в шаблоне
-  image:
-    repository: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store/sausage-backend:latest
-    tag: latest
-  replicas: 3
-  service:
-    port: 8080
-    targetPort: 8080
+  name: sausage-backend
   revisionHistoryLimit: 15
-  imagePullPolicy: Always
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 2
       maxSurge: 20%
-  startupProbe:
-    initialDelaySeconds: 20
-    periodSeconds: 30
-    timeoutSeconds: 10
-    failureThreshold: 6
+  image:
+    name: "sausage-backend"
+    tag: latest
+  vpa:
+    updateMode: "Auto"
+    resources:
+      minAllowed:
+        cpu: 0m
+        memory: 0Mi
+      maxAllowed:
+        cpu: 1
+        memory: 500Mi
 
 backend-report:
-  image:
-    repository: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store/sausage-backend-report:latest
-    tag: latest
-  replicas: 3
-  service:
-    port: 8081
-    targetPort: 8081
+  name: sausage-backend-report
   revisionHistoryLimit: 15
-  imagePullPolicy: Always
-  strategy:
-    type: Recreate
+  replicas: 3
+  image:
+    name: "sausage-backend-report"
+    tag: latest
+  hpa:
+    resources:
+      minReplicas: 1
+      maxReplicas: 3
+      averageUtilization: 75
 
 frontend:
-  image:
-    repository: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store/sausage-frontend:latest
-    tag: latest
-  replicas: 1
-  service:
-    port: 80
-    targetPort: 8080
+  name: sausage-frontend
   revisionHistoryLimit: 15
-  imagePullPolicy: Always
-  strategy:
-    type: Recreate
-  fqdn: lisitsin-aleksandr-06.k8s.praktikum-services.tech
-  ingress:
-    port: 80
+  fqdn: "lisitsin-aleksandr-06.k8s.praktikum-services.tech"
+  port: 80
+  replicas: 1
+  image:
+    name: "sausage-frontend"
+    tag: latest
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"

@@ -1,39 +1,69 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-report-{{ .Release.Name }}
+  name: "{{ .Chart.Name }}-{{ .Release.Name }}"
   namespace: "{{ .Release.Namespace }}"
   labels:
-    {{ include "sausage-store.labels" . | indent 4 }}
-    env: "{{ .Values.environment }}"
+    {{- include "sausage-store.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicas }}
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  replicas: {{ .Values.replicas }}
   strategy:
-    type: "{{ .Values.strategy.type }}"
+    type: Recreate
   selector:
     matchLabels:
-      app: "{{ .Chart.Name }}"
+      app: "{{ .Values.name }}"
   template:
     metadata:
       labels:
-        app: "{{ .Chart.Name }}"
+        app: "{{ .Values.name }}"
     spec:
       containers:
-        - name: backend-report
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: "{{ .Values.imagePullPolicy }}"
+        - image: {{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          name: "{{ .Values.name }}"
+          imagePullPolicy: IfNotPresent
           env:
             - name: VAULT_HOST
-              value: 51.250.87.102
+              valueFrom:
+                secretKeyRef:
+                  name: vault-helm
+                  key: vault_host
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: vault
+                  name: vault-helm
                   key: vault_token
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-helm
+                  key: postgres_host
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-helm
+                  key: postgres_port
+            - name: POSTGRES_DBNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-helm
+                  key: postgres_dbname
+            - name: SPRING_DATASOURCE_URL
+              value: "{{ .Values.global.springDatasourceUrl }}"
+            - name: BACKEND_PORT
+              value: {{ .Values.global.backendPort }}
+            - name: SPRING_FLYWAY_BASELINE
+              value: "{{ .Values.global.springFlywayBaseline }}"
           ports:
             - name: backend-report
-              containerPort: {{ .Values.service.targetPort }}
+              containerPort: {{ .Values.global.backendPort | int }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.global.backendPort | int }}
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 6
       imagePullSecrets:
-        - name: docker-config-secret
+        - name: docker-config-secret-helm
