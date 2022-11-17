@@ -56,7 +56,7 @@ spec:
               value: "{{ .Values.global.springFlywayBaseline }}"
           ports:
             - name: backend-report
-              containerPort: "{{ .Values.global.backendPort }}"
+              containerPort: {{ .Values.global.backendPort }}
           livenessProbe:
             httpGet:
               path: /actuator/health

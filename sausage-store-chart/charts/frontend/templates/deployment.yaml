@@ -43,7 +43,7 @@ spec:
               value: "http://localhost/api"
           ports:
             - name: frontend
-              containerPort: "{{ .Values.port }}"
+              containerPort: {{ .Values.port }}
           volumeMounts:
             - name: nginx-conf
               mountPath: /etc/nginx/conf.d/default.conf
