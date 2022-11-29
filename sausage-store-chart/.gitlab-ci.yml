@@ -65,6 +65,7 @@ deploy-argocd:
             -p secrets.vaultToken=${VAULT_TOKEN}\
             -p secrets.vaultHost=${VAULT_HOST} \
             -p secrets.dockerConfigJson=${DOCKER_CONFIG_JSON}
+    - argocd --grpc-web --auth-token $ARGO_TOKEN --server $ARGO_URL app sync $ARGO_APPLICATION_NAME
       
   environment:
     name: helm-pack
