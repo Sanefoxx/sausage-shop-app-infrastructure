@@ -50,3 +50,22 @@ deploy-helm:
   environment:
     name: helm-pack
     url: https://$SAUSAGE_STORE_URL
+
+deploy-argocd:
+  stage: deploy
+  image: argoproj/argocd:v2.5.2
+  when: manual
+  
+  script:
+    - >
+      argocd --grpc-web --auth-token $ARGO_TOKEN \
+            --server $ARGO_URL app set $ARGO_APPLICATION_NAME --revision $VERSION \
+            -p environment=test \
+            -p frontend.fqdn=${SAUSAGE_STORE_URL} \
+            -p secrets.vaultToken=${VAULT_TOKEN}\
+            -p secrets.vaultHost=${VAULT_HOST} \
+            -p secrets.dockerConfigJson=${DOCKER_CONFIG_JSON}
+      
+  environment:
+    name: helm-pack
+    url: https://$SAUSAGE_STORE_URL
