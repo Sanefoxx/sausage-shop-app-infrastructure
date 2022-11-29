@@ -6,6 +6,7 @@ secrets:
 
 global:
   backendPort: 8080
+  backendReportPort: 8081
   appName: sausage-store
   environment: test
   imageRegistry: gitlab.praktikum-services.ru:5050/a.lisitsin/sausage-store

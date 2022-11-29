@@ -37,11 +37,11 @@ spec:
               value: "{{ .Values.global.backendPort }}"
           ports:
             - name: backend-report
-              containerPort: {{ .Values.global.backendPort }}
+              containerPort: {{ .Values.global.backendReportPort }}
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.global.backendPort }}
+              port: {{ .Values.global.backendReportPort }}
             initialDelaySeconds: 15
             periodSeconds: 30
             timeoutSeconds: 2
