@@ -1,9 +1,6 @@
 secrets:
   vaultToken: ""
   vaultHost: ""
-  postgresHost: ""
-  postgresPort: ""
-  postgresDBName: ""
   dockerConfigJson: ""
 
 
