@@ -20,8 +20,8 @@ helm:
   trigger:
     include:
       - "/sausage-store-chart/.gitlab-ci.yml"
-      - "a.lisitsin/sausage-store"
     strategy: depend
-#  only:
-#    changes:
-#      - sausage-store-chart/**/*
+  only:
+    changes:
+      - sausage-store-chart/**/*
+      - a.lisitsin/sausage-store
