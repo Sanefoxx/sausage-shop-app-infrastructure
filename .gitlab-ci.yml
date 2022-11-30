@@ -21,7 +21,7 @@ helm:
     include:
       - "/sausage-store-chart/.gitlab-ci.yml"
     strategy: depend
-  only:
-    changes:
-      - sausage-store-chart/**/*
-      - a.lisitsin/sausage-store
+#  only:
+#    changes:
+#      - sausage-store-chart/**/*
+#      - a.lisitsin/sausage-store
