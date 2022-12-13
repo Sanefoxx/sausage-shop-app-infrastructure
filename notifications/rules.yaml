@@ -1,11 +1,24 @@
----
-groups:
-  - name: Sausage store rules
-    rules:
-      - alert: InstanceDown
-        expr: up{app="backend"} == 0
-        for: 1m
-        labels:
-          severity: critical
-          project: "sausage_store"
-          component: "Backend"
+apiVersion: v1
+data:
+  sausage-store.yaml: |
+    ---
+    groups:
+      - name: Sausage store rules
+        rules:
+          - alert: InstanceDown
+            expr: up{app="backend"} == 0
+            for: 1m
+            labels:
+              severity: critical
+              project: "sausage_store"
+              component: "Backend"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: prometheus
+    meta.helm.sh/release-namespace: 06-a-lisitsin
+  labels:
+    app: prometheus
+    app.kubernetes.io/managed-by: Helm
+  name: prometheus-rules
+  namespace: 06-a-lisitsin
