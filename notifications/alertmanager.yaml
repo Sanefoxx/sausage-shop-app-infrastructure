@@ -1,25 +1,36 @@
----
-global:
-  resolve_timeout: 1m
-  # Здесь будет webhook для Slack
-  slack_api_url: 'https://hooks.slack.com/services/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'
-
-route:
-  group_wait: 10s
-  group_interval: 30s
-  repeat_interval: 30m
-  receiver: "slack"
-  routes:
-    - receiver: "slack"
+apiVersion: v1
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: 1m
+      slack_api_url: 'https://hooks.slack.com/services/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'
+    route:
       group_wait: 10s
-      match_re:
-        severity: critical|warning
-      continue: true
-
-receivers:
-  - name: "slack"
-    slack_configs:
-      - send_resolved: true
-        # Имя канала нотификаций для вашей когорты
-        channel: '#dvs_06_notifications'
-        text: "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}"
+      group_interval: 30s
+      repeat_interval: 30m
+      receiver: "slack"
+      routes:
+        - receiver: "slack"
+          group_wait: 10s
+          match_re:
+            severity: critical|warning
+          continue: true
+    receivers:
+      - name: "slack"
+        slack_configs:
+          - send_resolved: true
+            channel: '#dvs_06_notifications'
+            text: "{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}\n{{ end }}"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: alertmanager
+    meta.helm.sh/release-namespace: 06-a-lisitsin
+  creationTimestamp: "2022-12-13T20:37:33Z"
+  labels:
+    app: alertmanager
+    app.kubernetes.io/managed-by: Helm
+  name: alertmanager
+  namespace: 06-a-lisitsin
+  resourceVersion: "401503337"
+  uid: bf32bce7-4b47-4856-926e-91f627002403
