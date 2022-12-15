@@ -13,7 +13,7 @@ data:
               project: "sausage_store"
               component: "Backend"
           - alert: Errors_500
-            expr: sum(http_server_requests_seconds_count{status="500"})
+            expr: sum(http_server_requests_seconds_count{status="500"}) > 0
             labels:
               severity: critical
               project: "sausage_store"
@@ -26,7 +26,7 @@ data:
               project: "sausage_store"
               component: "Backend"
           - alert: General_errors
-            expr: http_server_requests_seconds_count{uri="/actuator/prometheus", status=~"4.."}
+            expr: http_server_requests_seconds_count{uri="/actuator/prometheus", status!~"2.."} > 0
             for: 2m
             labels:
               severity: moderate
